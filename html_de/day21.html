@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tägliches Quiz</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:"Comic Sans MS", sans-serif;
+    background:linear-gradient(180deg,#FFECB3,#FFE082);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.quiz-card{
+    background:white;
+    width:90%;
+    max-width:420px;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+}
+
+h2{
+    margin:0 0 10px;
+    color:#FF7043;
+}
+
+.progress-text{
+    font-size:14px;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    background:#EEE;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#66BB6A,#43A047);
+    transition:width .4s ease;
+}
+
+.question{
+    font-size:20px;
+    font-weight:bold;
+    color:#333;
+    margin-bottom:16px;
+}
+
+.option-btn{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    font-size:18px;
+    border-radius:16px;
+    border:none;
+    cursor:pointer;
+    background:#E3F2FD;
+}
+
+.option-btn.correct{
+    background:#C8E6C9;
+}
+
+.option-btn.wrong{
+    background:#FFCDD2;
+}
+
+.message{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:14px;
+}
+
+.result{
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-card" id="card">
+
+<h2>🧠 Tägliches Quiz</h2>
+
+<div class="progress-text" id="progressText"></div>
+
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<div class="message" id="message"></div>
+
+</div>
+
+<script>
+
+const DAY_NUMBER = 21;
+
+const QUESTIONS = [{"question":"Was kommt nach 29?","options":["32","30","28","31"],"correctIndex":1},{"question":"Welcher Vogel schreit nachts?","options":["Schwan","Eule","Krähe","Ente"],"correctIndex":1},{"question":"Welche Farbe hat Schokolade?","options":["Blau","Braun","Silber","Rot"],"correctIndex":1},{"question":"Welcher Körperteil hilft uns beim Riechen?","options":["Nase","Füße","Augen","Ohren"],"correctIndex":0},{"question":"Was kommt nach 29?","options":["28","32","30","31"],"correctIndex":2},{"question":"Welcher Vogel kann sprechen?","options":["Pfau","Krähe","Papagei","Adler"],"correctIndex":2},{"question":"Welche Farbe hat Schokolade?","options":["Braun","Silber","Blau","Rot"],"correctIndex":0},{"question":"Welcher Körperteil hilft uns beim Gehen?","options":["Hände","Augen","Beine","Haare"],"correctIndex":2},{"question":"Was kommt nach 14?","options":["13","15","16","17"],"correctIndex":1},{"question":"Welche Form hat vier gleiche Seiten?","options":["Kreis","Dreieck","Quadrat","Oval"],"correctIndex":2}];
+
+let index = 0;
+let score = 0;
+let locked = false;
+
+function loadQuestion(){
+
+    locked = false;
+
+    document.getElementById("message").innerText = "";
+
+    document.getElementById("progressText").innerText =
+        `Frage ${index + 1} von ${QUESTIONS.length}`;
+
+    document.getElementById("progressFill").style.width =
+        ((index) / QUESTIONS.length) * 100 + "%";
+
+    document.getElementById("question").innerText =
+        QUESTIONS[index].question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    QUESTIONS[index].options.forEach((opt,i)=>{
+
+        const btn = document.createElement("button");
+
+        btn.className = "option-btn";
+
+        btn.innerText = opt;
+
+        btn.onclick = ()=>checkAnswer(btn,i===QUESTIONS[index].correctIndex);
+
+        optionsDiv.appendChild(btn);
+
+    });
+
+}
+
+function checkAnswer(button,isCorrect){
+
+    if(locked) return;
+
+    locked = true;
+
+    if(isCorrect){
+
+        score++;
+
+        button.classList.add("correct");
+
+        showMessage("🎉 Gut Gemacht!","#4CAF50");
+
+        setTimeout(nextQuestion,800);
+
+    }else{
+
+        button.classList.add("wrong");
+
+        showMessage("😊 Versuch es erneut!","#F44336");
+
+        locked = false;
+
+    }
+
+}
+
+function showMessage(text,color){
+
+    const msg = document.getElementById("message");
+
+    msg.innerText = text;
+
+    msg.style.color = color;
+
+}
+
+function nextQuestion(){
+
+    index++;
+
+    if(index < QUESTIONS.length){
+
+        loadQuestion();
+
+    }else{
+
+        finishQuiz();
+
+    }
+
+}
+
+function finishQuiz(){
+
+    document.getElementById("card").innerHTML = `
+        <div class="result">
+            <h1>🏆 Gut Gemacht!</h1>
+            <p>Dein Ergebnis <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+        </div>
+    `;
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
