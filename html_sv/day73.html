@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daglig Quiz</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:"Comic Sans MS", sans-serif;
+    background:linear-gradient(180deg,#FFECB3,#FFE082);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.quiz-card{
+    background:white;
+    width:90%;
+    max-width:420px;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+}
+
+h2{
+    margin:0 0 10px;
+    color:#FF7043;
+}
+
+.progress-text{
+    font-size:14px;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    background:#EEE;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#66BB6A,#43A047);
+    transition:width .4s ease;
+}
+
+.question{
+    font-size:20px;
+    font-weight:bold;
+    color:#333;
+    margin-bottom:16px;
+}
+
+.option-btn{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    font-size:18px;
+    border-radius:16px;
+    border:none;
+    cursor:pointer;
+    background:#E3F2FD;
+}
+
+.option-btn.correct{
+    background:#C8E6C9;
+}
+
+.option-btn.wrong{
+    background:#FFCDD2;
+}
+
+.message{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:14px;
+}
+
+.result{
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-card" id="card">
+
+<h2>🧠 Daglig Quiz</h2>
+
+<div class="progress-text" id="progressText"></div>
+
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<div class="message" id="message"></div>
+
+</div>
+
+<script>
+
+const DAY_NUMBER = 73;
+
+const QUESTIONS = [{"question":"Vilket fordon har två hjul?","options":["Buss","Cykel","Båt","Tåg"],"correctIndex":1},{"question":"Vilket fordon rör sig på vattnet?","options":["Buss","Båt","Bil","Tåg"],"correctIndex":1},{"question":"Vilken form har tre sidor?","options":["Oval","Triangel","Fyrkantig","Cirkel"],"correctIndex":1},{"question":"Vilken färg har choklad?","options":["Silver","Brun","Röd","Blå"],"correctIndex":1},{"question":"Vad kommer efter 9?","options":["12","8","11","10"],"correctIndex":3},{"question":"Vilken kroppsdel hjälper oss att gå?","options":["Hår","Händer","Ögon","Ben"],"correctIndex":3},{"question":"Vilken frukt är röd?","options":["Äpple","Kiwi","Banan","Päron"],"correctIndex":0},{"question":"Vilken färg har solen?","options":["Blå","Rosa","Grön","Gul"],"correctIndex":3},{"question":"Vilken färg har solen?","options":["Gul","Blå","Rosa","Grönt"],"correctIndex":0},{"question":"Vilken färg har gräs?","options":["Svart","Vit","Grön","Lila"],"correctIndex":2}];
+
+let index = 0;
+let score = 0;
+let locked = false;
+
+function loadQuestion(){
+
+    locked = false;
+
+    document.getElementById("message").innerText = "";
+
+    document.getElementById("progressText").innerText =
+        `Fråga ${index + 1} av ${QUESTIONS.length}`;
+
+    document.getElementById("progressFill").style.width =
+        ((index) / QUESTIONS.length) * 100 + "%";
+
+    document.getElementById("question").innerText =
+        QUESTIONS[index].question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    QUESTIONS[index].options.forEach((opt,i)=>{
+
+        const btn = document.createElement("button");
+
+        btn.className = "option-btn";
+
+        btn.innerText = opt;
+
+        btn.onclick = ()=>checkAnswer(btn,i===QUESTIONS[index].correctIndex);
+
+        optionsDiv.appendChild(btn);
+
+    });
+
+}
+
+function checkAnswer(button,isCorrect){
+
+    if(locked) return;
+
+    locked = true;
+
+    if(isCorrect){
+
+        score++;
+
+        button.classList.add("correct");
+
+        showMessage("🎉 Bra Jobbat!","#4CAF50");
+
+        setTimeout(nextQuestion,800);
+
+    }else{
+
+        button.classList.add("wrong");
+
+        showMessage("😊 Försök igen!","#F44336");
+
+        locked = false;
+
+    }
+
+}
+
+function showMessage(text,color){
+
+    const msg = document.getElementById("message");
+
+    msg.innerText = text;
+
+    msg.style.color = color;
+
+}
+
+function nextQuestion(){
+
+    index++;
+
+    if(index < QUESTIONS.length){
+
+        loadQuestion();
+
+    }else{
+
+        finishQuiz();
+
+    }
+
+}
+
+function finishQuiz(){
+
+    document.getElementById("card").innerHTML = `
+        <div class="result">
+            <h1>🏆 Bra Jobbat!</h1>
+            <p>Din poäng <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+        </div>
+    `;
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
