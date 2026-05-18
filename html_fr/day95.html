@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Quotidien</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:"Comic Sans MS", sans-serif;
+    background:linear-gradient(180deg,#FFECB3,#FFE082);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.quiz-card{
+    background:white;
+    width:90%;
+    max-width:420px;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+}
+
+h2{
+    margin:0 0 10px;
+    color:#FF7043;
+}
+
+.progress-text{
+    font-size:14px;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    background:#EEE;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#66BB6A,#43A047);
+    transition:width .4s ease;
+}
+
+.question{
+    font-size:20px;
+    font-weight:bold;
+    color:#333;
+    margin-bottom:16px;
+}
+
+.option-btn{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    font-size:18px;
+    border-radius:16px;
+    border:none;
+    cursor:pointer;
+    background:#E3F2FD;
+}
+
+.option-btn.correct{
+    background:#C8E6C9;
+}
+
+.option-btn.wrong{
+    background:#FFCDD2;
+}
+
+.message{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:14px;
+}
+
+.result{
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-card" id="card">
+
+<h2>🧠 Quiz Quotidien</h2>
+
+<div class="progress-text" id="progressText"></div>
+
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<div class="message" id="message"></div>
+
+</div>
+
+<script>
+
+const DAY_NUMBER = 95;
+
+const QUESTIONS = [{"question":"Qu’utilisons-nous pour nous brosser les dents ?","options":["Plaque","Cuillère","Brosse à dents","Fourchette"],"correctIndex":2},{"question":"De quelle couleur est le soleil ?","options":["Rose","Jaune","Vert","Bleu"],"correctIndex":1},{"question":"Qu'utilisons-nous pour nous brosser les dents ?","options":["Fourchette","Cuillère","Plaque","Brosse à dents"],"correctIndex":3},{"question":"Quel fruit est rouge ?","options":["Poire","Banane","Pomme","Kiwis"],"correctIndex":2},{"question":"Que se passe-t-il après 14 heures ?","options":["16","17","13","15"],"correctIndex":3},{"question":"Qu'utilisons-nous pour nous brosser les dents ?","options":["Plaque","Brosse à dents","Fourchette","Cuillère"],"correctIndex":1},{"question":"Quelle partie du corps nous aide à entendre ?","options":["Les oreilles","Nez","Les mains","Yeux"],"correctIndex":0},{"question":"Qu'utilisons-nous pour nous brosser les dents ?","options":["Plaque","Fourchette","Cuillère","Brosse à dents"],"correctIndex":3},{"question":"Quel fruit est rouge ?","options":["Pomme","Kiwis","Poire","Banane"],"correctIndex":0},{"question":"Quelle partie du corps nous aide à marcher ?","options":["Les yeux","Jambes","Cheveux","Ha"],"correctIndex":1}];
+
+let index = 0;
+let score = 0;
+let locked = false;
+
+function loadQuestion(){
+
+    locked = false;
+
+    document.getElementById("message").innerText = "";
+
+    document.getElementById("progressText").innerText =
+        `Question ${index + 1} sur ${QUESTIONS.length}`;
+
+    document.getElementById("progressFill").style.width =
+        ((index) / QUESTIONS.length) * 100 + "%";
+
+    document.getElementById("question").innerText =
+        QUESTIONS[index].question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    QUESTIONS[index].options.forEach((opt,i)=>{
+
+        const btn = document.createElement("button");
+
+        btn.className = "option-btn";
+
+        btn.innerText = opt;
+
+        btn.onclick = ()=>checkAnswer(btn,i===QUESTIONS[index].correctIndex);
+
+        optionsDiv.appendChild(btn);
+
+    });
+
+}
+
+function checkAnswer(button,isCorrect){
+
+    if(locked) return;
+
+    locked = true;
+
+    if(isCorrect){
+
+        score++;
+
+        button.classList.add("correct");
+
+        showMessage("🎉 Bon Travail !","#4CAF50");
+
+        setTimeout(nextQuestion,800);
+
+    }else{
+
+        button.classList.add("wrong");
+
+        showMessage("😊 Réessayez !","#F44336");
+
+        locked = false;
+
+    }
+
+}
+
+function showMessage(text,color){
+
+    const msg = document.getElementById("message");
+
+    msg.innerText = text;
+
+    msg.style.color = color;
+
+}
+
+function nextQuestion(){
+
+    index++;
+
+    if(index < QUESTIONS.length){
+
+        loadQuestion();
+
+    }else{
+
+        finishQuiz();
+
+    }
+
+}
+
+function finishQuiz(){
+
+    document.getElementById("card").innerHTML = `
+        <div class="result">
+            <h1>🏆 Bravo !</h1>
+            <p>Votre score est <b>${score}</b> / <b>${QUESTIONS.length}</b></p>
+        </div>
+    `;
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
