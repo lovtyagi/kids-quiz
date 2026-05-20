@@ -223,6 +223,9 @@ function finishQuiz(){
         </div>
     `;
 
+ setTimeout(() => {
+        Android.onQuizCompleted(score, QUESTIONS.length);
+    }, 500);
 }
 
 loadQuestion();
