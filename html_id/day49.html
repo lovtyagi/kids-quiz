@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Quiz</title>
+
+<style>
+
+*{
+    box-sizing:border-box;
+}
+
+body{
+    margin:0;
+    font-family:"Comic Sans MS", sans-serif;
+    background:linear-gradient(180deg,#FFECB3,#FFE082);
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.quiz-card{
+    background:white;
+    width:90%;
+    max-width:420px;
+    border-radius:24px;
+    padding:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,0.15);
+}
+
+h2{
+    margin:0 0 10px;
+    color:#FF7043;
+}
+
+.progress-text{
+    font-size:14px;
+    margin-bottom:6px;
+    color:#555;
+}
+
+.progress-bar{
+    width:100%;
+    height:10px;
+    background:#EEE;
+    border-radius:10px;
+    overflow:hidden;
+    margin-bottom:18px;
+}
+
+.progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#66BB6A,#43A047);
+    transition:width .4s ease;
+}
+
+.question{
+    font-size:20px;
+    font-weight:bold;
+    color:#333;
+    margin-bottom:16px;
+}
+
+.option-btn{
+    width:100%;
+    padding:14px;
+    margin:8px 0;
+    font-size:18px;
+    border-radius:16px;
+    border:none;
+    cursor:pointer;
+    background:#E3F2FD;
+}
+
+.option-btn.correct{
+    background:#C8E6C9;
+}
+
+.option-btn.wrong{
+    background:#FFCDD2;
+}
+
+.message{
+    font-size:20px;
+    font-weight:bold;
+    margin-top:14px;
+}
+
+.result{
+    text-align:center;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="quiz-card" id="card">
+
+<h2>🧠 Kuis Harian</h2>
+
+<div class="progress-text" id="progressText"></div>
+
+<div class="progress-bar">
+<div class="progress-fill" id="progressFill"></div>
+</div>
+
+<div class="question" id="question"></div>
+
+<div id="options"></div>
+
+<div class="message" id="message"></div>
+
+</div>
+
+<script>
+
+const DAY_NUMBER = 49;
+
+const QUESTIONS = [{"question":"Huruf apa yang muncul setelah K?","options":["Y","SEBUAH","L","H"],"correctIndex":2},{"question":"Berapakah 15 - 10?","options":["4","7","6","5"],"correctIndex":3},{"question":"Berapakah 30 - 20?","options":["10","12","11","9"],"correctIndex":0},{"question":"Berapakah 14 + 9?","options":["23","24","25","22"],"correctIndex":0},{"question":"Hewan apa yang berleher panjang?","options":["Singa","Gajah","Beruang","Jerapah"],"correctIndex":3},{"question":"Berapakah 39","options":["5","6","3","4"],"correctIndex":3},{"question":"Huruf apa yang muncul sebelum H?","options":["hal","G","R","M"],"correctIndex":1},{"question":"Apa itu 5 + 7?","options":["14","11","12","13"],"correctIndex":2},{"question":"Berapakah 14 + 4?","options":["17","19","20","18"],"correctIndex":3},{"question":"Minuman apa yang berasal dari sapi?","options":["Jus","Susu","Air","Teh"],"correctIndex":1}];
+
+let index = 0;
+let score = 0;
+let locked = false;
+
+function loadQuestion(){
+
+    locked = false;
+
+    document.getElementById("message").innerText = "";
+
+    document.getElementById("progressText").innerText =
+        `Pertanyaan ${index + 1} dari ${QUESTIONS.length}`;
+
+    document.getElementById("progressFill").style.width =
+        ((index) / QUESTIONS.length) * 100 + "%";
+
+    document.getElementById("question").innerText =
+        QUESTIONS[index].question;
+
+    const optionsDiv = document.getElementById("options");
+
+    optionsDiv.innerHTML = "";
+
+    QUESTIONS[index].options.forEach((opt,i)=>{
+
+        const btn = document.createElement("button");
+
+        btn.className = "option-btn";
+
+        btn.innerText = opt;
+
+        btn.onclick = ()=>checkAnswer(btn,i===QUESTIONS[index].correctIndex);
+
+        optionsDiv.appendChild(btn);
+
+    });
+
+}
+
+function checkAnswer(button,isCorrect){
+
+    if(locked) return;
+
+    locked = true;
+
+    if(isCorrect){
+
+        score++;
+
+        button.classList.add("correct");
+
+        showMessage("🎉 Kerja Bagus!","#4CAF50");
+
+        setTimeout(nextQuestion,800);
+
+    }else{
+
+        button.classList.add("wrong");
+
+        showMessage("😊 Coba Lagi!","#F44336");
+
+        locked = false;
+
+    }
+
+}
+
+function showMessage(text,color){
+
+    const msg = document.getElementById("message");
+
+    msg.innerText = text;
+
+    msg.style.color = color;
+
+}
+
+function nextQuestion(){
+
+    index++;
+
+    if(index < QUESTIONS.length){
+
+        loadQuestion();
+
+    }else{
+
+        finishQuiz();
+
+    }
+
+}
+
+function finishQuiz(){
+
+    document.getElementById("card").innerHTML = `
+        <div class="result">
+            <h1>🏆 Kerja Bagus!</h1>
+            <p>Skormu <b>${score}</b> dari <b>${QUESTIONS.length}</b></p>
+        </div>
+    `;
+
+ setTimeout(() => {
+        Android.onQuizCompleted(score, QUESTIONS.length);
+    }, 500);
+
+}
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
